@@ -17,6 +17,7 @@ public class Manager extends Worker {
     public Manager(int workerId, int portNumber, int[] neighbors) {
         super(workerId, portNumber, neighbors);
 
+        System.out.println("Creating manager");
 
     }
 
@@ -27,9 +28,9 @@ public class Manager extends Worker {
         int[] result = new int[array.length];								// Array to store the sorted array
         int arrayLength = array.length;										// length of the array to sort
         Queue<QuicksortTask> taskQueue = new LinkedList<QuicksortTask>();	// Task FIFO list
-
+        System.out.println("Start manager");
         // Creates first task and puts it in the task queue:
-        QuicksortTask firstTask = new QuicksortTask(0, 1, array);
+        QuicksortTask firstTask = new QuicksortTask(0, 0, array);
         taskQueue.add(firstTask);
 
         try {

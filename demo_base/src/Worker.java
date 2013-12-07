@@ -19,6 +19,8 @@ public class Worker {
         mWorkerId = workerId;
         mPortNumber = portNumber;
         mNeighbors = neighbors;
+
+        System.out.println("Creating worker");
     }
 
     protected int getMessageLength() throws IOException {
@@ -50,6 +52,7 @@ public class Worker {
         QuicksortTask task = null;
 
         try {
+            task = getTaskFromInput();
             // He then sends another message.
             do if (task != null) {
                 task.printTask();

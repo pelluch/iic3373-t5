@@ -8,21 +8,19 @@ public class Main {
     public static void main(String[] args) {
         // Study the received arguments to know what to parse
 
-        if(args.length != 6) {
-            System.out.println("Error: incorrect number of arguments");
-        }
-
         int workerId = 0;
         int portNumber = 0;
         int[] neighbors = null;
         boolean isManager = false;
 
         for(int i = 0; i < args.length; ++i) {
-            if(args[i] == "-id") {
+
+
+            if(args[i].equals("-id")) {
                 i++;
                 workerId = Integer.parseInt(args[i]);
             }
-            else if(args[i] == "-neighbors") {
+            else if(args[i].equals("-neighbors")) {
                 i++;
                 // Comma separated list of neighbor ids
                 String[] neighborList = args[i].split(",");
@@ -31,11 +29,11 @@ public class Main {
                     neighbors[j] = Integer.parseInt(neighborList[j]);
                 }
             }
-            else if(args[i] == "-port") {
+            else if(args[i].equals("-port")) {
                 i++;
                 portNumber = Integer.parseInt(args[i]);
             }
-            else if(args[i] == "-main") {
+            else if(args[i].equals("-main")) {
                 isManager = true;
             }
             else {
@@ -44,13 +42,17 @@ public class Main {
         }
 
         Worker worker = null;
+        Manager manager = null;
+
         if(isManager) {
-            worker = new Manager(workerId, portNumber, neighbors);
+            manager = new Manager(workerId, portNumber, neighbors);
+            manager.start();
         }
         else {
             worker = new Worker(workerId, portNumber, neighbors);
+            worker.start();
         }
-        worker.start();
+
 
 
 
