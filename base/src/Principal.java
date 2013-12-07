@@ -6,7 +6,7 @@ public class Principal {
         // runnable JAR defined by the student.
     	
     	// name of the jar file:
-    	String jarRoute = "/home/pablo/src/iic3373/t5/main.jar";
+    	String jarRoute = "../main.jar";
     	
     	// Rebuilds the jar file:
         try {

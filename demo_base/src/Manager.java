@@ -26,6 +26,7 @@ public class Manager extends Worker {
         int[] result = new int[array.length];								// Array to store the sorted array
         int arrayLength = array.length;										// length of the array to sort
         Queue<QuicksortTask> taskQueue = new LinkedList<QuicksortTask>();	// Task FIFO list
+        System.out.println("Start manager");
 
 
         // Creates first task and puts it in the task queue:
@@ -35,11 +36,18 @@ public class Manager extends Worker {
         try {
             mClientSocket = new Socket((String) null, mPortNumber);
             while(answerCount < arrayLength){
-                // Main process sends a message to neighbor of id 1
-                // ------------------------------------------------------------------------------------
-                QuicksortTask task = taskQueue.remove();
-                sendMessage(1, task);
-                task = receiveMessage();
+
+            	// Main process sends a message to neighbors
+                // ------------------------------------------------------------------------------------                
+            	QuicksortTask task;
+            	
+            	for(int i = 0; i < mNeighbors.length && taskQueue.size() > 0; i++){                
+                    task = taskQueue.remove();
+                	sendMessage(mNeighbors[i], task);
+                }
+                
+            	task = receiveMessage();
+
                 // Obtained the result, we then proceed to get its result:
                 int resultPivotPos = task.getPivotPos();
                 int resultStartIndex = task.getStartIndex();
