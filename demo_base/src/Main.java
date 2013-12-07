@@ -50,6 +50,7 @@ public class Main {
         else {
             worker = new Worker(workerId, portNumber, neighbors);
         }
+        worker.start();
 
 
 

@@ -9,7 +9,7 @@ import java.util.Scanner;
 import java.util.concurrent.Semaphore;
 
 public class Executor {
-    private static final String TEST_FILE_NAME = "test_base.txt";
+    private static final String TEST_FILE_NAME = "test.txt";
     private static final int PORT_COUNTER = 10030;
 
     private int mProcesses;
@@ -194,19 +194,16 @@ public class Executor {
                     int length = a * 256 + b;
                     in.read(buffer, 0, length);
 
-                    ArrayMessage arrayMessage = (ArrayMessage) SerializationUtilities.deserialize(
+                    Message message = (Message) SerializationUtilities.deserialize(
                             buffer, 0, length);
-                    System.out.println("Message received from " + arrayMessage.getSender()
-                            + " to " + arrayMessage.getReceiver());
+                    System.out.println("Message received from " + message.getSender()
+                            + " to " + message.getReceiver());
 
-                    int[] sortedArray = arrayMessage.getPayload();
+                    byte[] sortedArray = message.getPayload();
 
 
 
-                    for(int i = 0; i < sortedArray.length; ++i) {
-                        System.out.print("" + i + ", ");
-                    }
-                    System.out.println("");
+
                     //mListeners[m.getReceiver()].sendMessage(m);
                 }
 
