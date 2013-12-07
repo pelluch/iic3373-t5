@@ -124,6 +124,7 @@ public class Executor {
                 commands.add("-main");
             }
 
+
             ProcessBuilder builder = new ProcessBuilder(commands);
             builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
             builder.start();
@@ -167,7 +168,7 @@ public class Executor {
         public void run() {
             try {
                 mSocket = mServer.accept();
-                startRelayingMessages();
+                 startRelayingMessages();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -185,6 +186,7 @@ public class Executor {
                 byte[] buffer = new byte[65536];
                 InputStream in = mSocket.getInputStream();
                 while (true) {
+                    //System.out.println("Id: " + mId);
                     int a = in.read();
                     if (a == -1) {
                         continue;

@@ -21,13 +21,15 @@ public class Worker {
         mPortNumber = portNumber;
         mNeighbors = neighbors;
 
-        System.out.println("Creating worker");
+        System.out.println("mWorker id = " + mWorkerId);
+        System.out.println("mPortNumber id = " + mPortNumber);
+        System.out.println("mNeighbors = " + mNeighbors);
     }
 
     protected int getMessageLength() throws IOException {
 
-        byte a = (byte)mClientSocket.getInputStream().read();
-        byte b = (byte)mClientSocket.getInputStream().read();
+        int a = mClientSocket.getInputStream().read();
+        int b = mClientSocket.getInputStream().read();
 
         int length = (256 * a + b);
         return length;
@@ -46,9 +48,9 @@ public class Worker {
             QuicksortTask task = null;
 
             do{
-                System.out.println("Before receive message");
+                System.out.println("Before WORKER " + mWorkerId + " receive message");
                 task = receiveMessage();
-                System.out.println("After receive message");
+                System.out.println("After WORKER " + mWorkerId + " receive message");
                 if(task != null){
                     QuicksortTask result = task.executeTask();
                     sendMessage(0, result);
@@ -68,11 +70,13 @@ public class Worker {
 
     protected QuicksortTask receiveMessage() throws Exception {
 
+        System.out.println("Getting input stream");
         InputStream in = mClientSocket.getInputStream();
-
+        System.out.println("Getting length");
         int length = getMessageLength();
-
+        System.out.println("Length is " + length);
         byte[] buffer = new byte[length];
+        System.out.println("Reading buffer");
 
         in.read(buffer, 0, length);
 

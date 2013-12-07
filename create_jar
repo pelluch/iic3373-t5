@@ -1,0 +1,8 @@
+#!/bin/bash
+
+cd demo_base/src
+javac *.java
+mv *.class ../bin
+cd ../bin
+jar cfm main.jar ../../manifest_options *.class
+mv main.jar ../..

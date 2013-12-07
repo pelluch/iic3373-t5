@@ -6,12 +6,11 @@ public class Principal {
         // runnable JAR defined by the student.
     	
     	// name of the jar file:
-    	String route = "../demo_base/bin/";
-    	String jarFile = "main.jar";
+    	String jarRoute = "/home/pablo/src/iic3373/t5/main.jar";
     	
     	// Rebuilds the jar file:
         try {
-	        Executor executor = new Executor(route + jarFile);
+	        Executor executor = new Executor(jarRoute);
 
 	        executor.execute();
         } catch (Exception e) {

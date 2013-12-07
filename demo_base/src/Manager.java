@@ -19,7 +19,6 @@ public class Manager extends Worker {
     public Manager(int workerId, int portNumber, int[] neighbors) {
         super(workerId, portNumber, neighbors);
 
-        System.out.println("Creating manager");
 
     }
 
@@ -43,11 +42,11 @@ public class Manager extends Worker {
                 // Main process sends a message to neighbor of id 1
                 // ------------------------------------------------------------------------------------
                 QuicksortTask task = taskQueue.remove();
-                System.out.println("Before send message");
+                System.out.println("Before send message MANAGER");
                 sendMessage(1, task);
-                System.out.println("After send message");
+                System.out.println("After send message MANAGER");
                 task = receiveMessage();
-                System.out.println("After receive message");
+                System.out.println("After receive message MANAGER");
                 // Obtained the result, we then proceed to get its result:
                 int resultPivotPos = task.getPivotPos();
                 int resultStartIndex = task.getStartIndex();
