@@ -5,7 +5,7 @@ public class Principal {
         // Constructor parameter must be replaced by the path of the
         // runnable JAR defined by the student.
         Executor executor = new Executor(
-                "../../demo_base/bin/demo_base.jar");
+                "../demo_base/bin/main.jar");
         try {
             executor.execute();
         } catch (Exception e) {
