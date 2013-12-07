@@ -1,5 +1,7 @@
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -29,52 +31,23 @@ public class Manager extends Worker {
         int arrayLength = array.length;										// length of the array to sort
         Queue<QuicksortTask> taskQueue = new LinkedList<QuicksortTask>();	// Task FIFO list
         System.out.println("Start manager");
+
+
         // Creates first task and puts it in the task queue:
-        QuicksortTask firstTask = new QuicksortTask(0, 0, array);
+        QuicksortTask firstTask = new QuicksortTask(0, 1, array);
         taskQueue.add(firstTask);
 
         try {
-
+            mClientSocket = new Socket((String) null, mPortNumber);
             while(answerCount < arrayLength){
                 // Main process sends a message to neighbor of id 1
                 // ------------------------------------------------------------------------------------
                 QuicksortTask task = taskQueue.remove();
-
-                byte[] payload = SerializationUtilities.serialize(task);
-                Message m = new Message(0, 1, payload);
-
-                // Now we serialize the message:
-                byte[] data = SerializationUtilities.serialize(m);
-
-                OutputStream out = mClientSocket.getOutputStream();
-                // two first bytes indicate the length in big endian format
-                byte a = (byte)(data.length / 256);
-                byte b = (byte)(data.length % 256);
-
-                out.write(a);
-                out.write(b);
-                out.write(data);
-
-
-                // Now we read the answer:
-                // ------------------------------------------------------------------------------------
-                a = (byte)mClientSocket.getInputStream().read();
-                b = (byte)mClientSocket.getInputStream().read();
-
-
-                int length = (256 * a + b);
-
-
-                byte[] buffer = new byte[length];
-
-                mClientSocket.getInputStream().read(buffer, 0, length);
-
-                m = (Message) SerializationUtilities.deserialize(buffer, 0, length);
-
-                // Now we get the task:
-                payload = m.getPayload();
-                task = (QuicksortTask)SerializationUtilities.deserialize(payload, 0, payload.length);
-
+                System.out.println("Before send message");
+                sendMessage(1, task);
+                System.out.println("After send message");
+                task = receiveMessage();
+                System.out.println("After receive message");
                 // Obtained the result, we then proceed to get its result:
                 int resultPivotPos = task.getPivotPos();
                 int resultStartIndex = task.getStartIndex();
@@ -90,7 +63,7 @@ public class Manager extends Worker {
                     int newStartIndex = resultStartIndex + resultPivotPos + 1;
                     int[] newArray = new int[newLength];
 
-                    for(int originalIndex = resultPivotPos + 1, index = 0; originalIndex < newArray.length; originalIndex++, index++)
+                    for(int originalIndex = resultPivotPos + 1, index = 0; originalIndex < resultArray.length; originalIndex++, index++)
                         newArray[index] = resultArray[originalIndex];
 
                     QuicksortTask newTask = new QuicksortTask(newStartIndex, -1, newArray);
@@ -107,33 +80,21 @@ public class Manager extends Worker {
                     QuicksortTask newTask = new QuicksortTask(newStartIndex, -1, newArray);
                     taskQueue.add(newTask);
                 }
-
-                // Once ended, print result and send null task to children (in this case, process 1):
-                // ------------------------------------------------------------------------------------
-                System.out.println("RESULT");
-                System.out.println("==========================================================");
-                System.out.print("[");
-
-                for(int i = 0; i < result.length; i++)
-                    System.out.print(result[i] + ", ");
-                System.out.println("EOT]");
-                System.out.println("==========================================================");
-
-                payload = SerializationUtilities.serialize(null);
-                m = new Message(0, 1, payload);
-
-                // Now we serialize the message:
-                data = SerializationUtilities.serialize(m);
-
-                out = mClientSocket.getOutputStream();
-                // two first bytes indicate the length in big endian format
-                a = (byte)(data.length / 256);
-                b = (byte)(data.length % 256);
-
-                out.write(a);
-                out.write(b);
-                out.write(data);
             }
+
+            // Once ended, print result and send null task to children (in this case, process 1):
+            // ------------------------------------------------------------------------------------
+           sendMessage(1, null);
+            System.out.println("RESULT");
+            System.out.println("==========================================================");
+            System.out.print("[");
+
+            for(int i = 0; i < result.length; i++)
+                System.out.print(result[i] + ", ");
+            System.out.println("EOT]");
+            System.out.println("==========================================================");
+
+
         }
         catch(IOException ioException) {
             System.out.println("Socket exception");

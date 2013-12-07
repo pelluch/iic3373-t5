@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.Socket;
 import java.net.ServerSocket;
 import java.io.OutputStream;
@@ -34,39 +35,26 @@ public class Worker {
     }
 
     protected QuicksortTask getTaskFromInput() throws Exception {
-        int length = getMessageLength();
-        byte[] buffer = new byte[length];
 
-        mClientSocket.getInputStream().read(buffer, 0, length);
-
-        Message m = (Message) SerializationUtilities.deserialize(
-                buffer, 0, length);
-
-        // Now we get the task:
-        byte[] payload = m.getPayload();
-        QuicksortTask task = (QuicksortTask)SerializationUtilities.deserialize(payload, 0, payload.length);
-        return task;
+        return null;
     }
 
     protected void start() {
-        QuicksortTask task = null;
 
         try {
-            task = getTaskFromInput();
-            // He then sends another message.
-            do if (task != null) {
-                task.printTask();
-                QuicksortTask result = task.executeTask();
-                result.printTask();
-                task = getTaskFromInput();
-                // Now we send the result back to
-                byte [] payload = SerializationUtilities.serialize(result);
+            mClientSocket = new Socket((String) null, mPortNumber);
+            QuicksortTask task = null;
 
-                Message m = new Message(1, 0, payload);
-                byte[] data = SerializationUtilities.serialize(m);
-
-
-            } while(task != null);
+            do{
+                System.out.println("Before receive message");
+                task = receiveMessage();
+                System.out.println("After receive message");
+                if(task != null){
+                    QuicksortTask result = task.executeTask();
+                    sendMessage(0, result);
+                }
+                // He then sends another message.
+            }while(task != null);
         }
         catch(IOException ioException) {
             System.out.println("Socket exception");
@@ -78,18 +66,47 @@ public class Worker {
         }
     }
 
+    protected QuicksortTask receiveMessage() throws Exception {
 
-    protected void sendMessage(int receiverId, byte[] payload) throws IOException {
+        InputStream in = mClientSocket.getInputStream();
+
+        int length = getMessageLength();
+
+        byte[] buffer = new byte[length];
+
+        in.read(buffer, 0, length);
+
+        Message m = (Message) SerializationUtilities.deserialize(buffer, 0, length);
+
+        // Now we get the task:
+        byte[] payload = m.getPayload();
+        QuicksortTask task = (QuicksortTask)SerializationUtilities.deserialize(payload, 0, payload.length);
+
+
+        return task;
+
+    }
+    protected void sendMessage(int receiverId, QuicksortTask task) throws Exception {
 
         OutputStream out = mClientSocket.getOutputStream();
-        // two first bytes indicate the length in big endian format
+        // Sserialize task
+        byte[] payload = SerializationUtilities.serialize(task);
 
-        int a = (byte)(payload.length / 256);
-        int b = (byte)(payload.length % 256);
+        Message m = new Message(mWorkerId, receiverId, payload);
+
+        // Now we serialize the message:
+        byte[] data = SerializationUtilities.serialize(m);
+
+        // two first bytes indicate the length in big endian format
+        int a, b;
+
+        a = (data.length / 256);
+        b = (data.length % 256);
 
         out.write(a);
         out.write(b);
-        out.write(payload);
+        out.write(data);
+
 
     }
 
