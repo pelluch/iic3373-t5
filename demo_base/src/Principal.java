@@ -1,3 +1,4 @@
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.LinkedList;
@@ -6,7 +7,6 @@ import java.util.Queue;
 public class Principal {
     // This simulation assumes the existence of two processes of ids 0 and 1
     // where the one with id 0 is the main process.
-	
 
     public static void main(String[] args) {
         // Study the received arguments to know what to parse
@@ -31,7 +31,10 @@ public class Principal {
             	QuicksortTask firstTask = new QuicksortTask(0, 1, array);
             	taskQueue.add(firstTask);
             	
-            	while(answerCount < arrayLength){                	
+                OutputStream out = socket.getOutputStream();
+                InputStream in = socket.getInputStream();
+
+                while(answerCount < arrayLength){                	
                 	// Main process sends a message to neighbor of id 1
                     // ------------------------------------------------------------------------------------
             		QuicksortTask task = taskQueue.remove();
@@ -42,41 +45,43 @@ public class Principal {
                 	// Now we serialize the message:
                     byte[] data = SerializationUtilities.serialize(m);
 
-                    OutputStream out = socket.getOutputStream();
                     // two first bytes indicate the length in big endian format
-                    byte a = (byte)(data.length / 256);
-                    byte b = (byte)(data.length % 256);
+                    int a, b;
 
+                    a = (data.length / 256);
+                	b = (data.length % 256);
+             
                     out.write(a);
                     out.write(b);
                     out.write(data);
 
-                    System.out.println("Message length = " + data.length);
-                    System.out.println("Message a = " + a);
-                    System.out.println("Message b = " + b);
-                    System.out.println("Message length2 = " + (a * 256 + b));
+                    System.out.println("P0 Write Message length = " + data.length);
+                    System.out.println("P0 Write Message a = " + a);
+                    System.out.println("P0 Write Message b = " + b);
+                    System.out.println("P0 Write Message length2 = " + (a * 256 + b));
                     
                     // Now we read the answer:
                     // ------------------------------------------------------------------------------------
-                    a = (byte)socket.getInputStream().read();
-                    b = (byte)socket.getInputStream().read();
+                	a = in.read();                    
+                    b = in.read();
                     
-                    System.out.println("Message a = " + a);
-                    System.out.println("Message b = " + b);
+                    System.out.println("P0 Read Message a = " + a);
+                    System.out.println("P0 Read Message b = " + b);
 
                     int length = (256 * a + b);
                     
-                    System.out.println("Message length3 = " + length);
+                    System.out.println("P0 Read Message length4 = " + length);
                     
                     byte[] buffer = new byte[length];
                     
-                    socket.getInputStream().read(buffer, 0, length);
+                    in.read(buffer, 0, length);
 
                     m = (Message) SerializationUtilities.deserialize(buffer, 0, length);
                     
                     // Now we get the task:
                     payload = m.getPayload();
                     task = (QuicksortTask)SerializationUtilities.deserialize(payload, 0, payload.length);
+                    task.printTask();
                     
                     // Obtained the result, we then proceed to get its result:
                     int resultPivotPos = task.getPivotPos(); 
@@ -93,7 +98,7 @@ public class Principal {
                     	int newStartIndex = resultStartIndex + resultPivotPos + 1;
                     	int[] newArray = new int[newLength]; 
                     	
-                    	for(int originalIndex = resultPivotPos + 1, index = 0; originalIndex < newArray.length; originalIndex++, index++)
+                    	for(int originalIndex = resultPivotPos + 1, index = 0; originalIndex < resultArray.length; originalIndex++, index++)
                     		newArray[index] = resultArray[originalIndex];
                     	
                     	QuicksortTask newTask = new QuicksortTask(newStartIndex, -1, newArray);
@@ -110,46 +115,45 @@ public class Principal {
                     	QuicksortTask newTask = new QuicksortTask(newStartIndex, -1, newArray);
                     	taskQueue.add(newTask);                    		
                     }
-                    
-                    // Once ended, print result and send null task to children (in this case, process 1):
-                    // ------------------------------------------------------------------------------------
-                    System.out.println("RESULT");
-                    System.out.println("==========================================================");
-                    System.out.print("[");
-                    
-                    for(int i = 0; i < result.length; i++)
-                    	System.out.print(result[i] + ", ");
-                    System.out.println("EOT]");
-                    System.out.println("==========================================================");
-                                        	
-                	payload = SerializationUtilities.serialize(null);
-                	m = new Message(0, 1, payload);
-                	
-                	// Now we serialize the message:
-                    data = SerializationUtilities.serialize(m);
-
-                    out = socket.getOutputStream();
-                    // two first bytes indicate the length in big endian format
-                    a = (byte)(data.length / 256);
-                    b = (byte)(data.length % 256);
-
-                    out.write(a);
-                    out.write(b);
-                    out.write(data);
             	}
+                
+                // Once ended, print result and send null task to children (in this case, process 1):
+                // ------------------------------------------------------------------------------------
+                System.out.println("RESULT");
+                System.out.println("==========================================================");
+                System.out.print("[");
+                
+                for(int i = 0; i < result.length; i++)
+                	System.out.print(result[i] + ", ");
+                System.out.println("EOT]");
+                System.out.println("==========================================================");
+                                    	
+            	byte[] payload = SerializationUtilities.serialize(null);
+            	Message m = new Message(0, 1, payload);
+            	
+            	// Now we serialize the message:
+                byte[] data = SerializationUtilities.serialize(m);
+
+                // two first bytes indicate the length in big endian format
+                byte a = (byte)(data.length / 256);
+                byte b = (byte)(data.length % 256);
+
+                out.write(a);
+                out.write(b);
+                out.write(data);
+                
             } else {
             	QuicksortTask task = null;
-            	
             	do{
-                    byte a = (byte)socket.getInputStream().read();
-                    byte b = (byte)socket.getInputStream().read();
+                    int a = socket.getInputStream().read();
+                    int b = socket.getInputStream().read();
                     
-                    System.out.println("Message a = " + a);
-                    System.out.println("Message b = " + b);
+                    System.out.println("P1 Read Message a2 = " + a);
+                    System.out.println("P1 Read Message b2 = " + b);
 
                     int length = (256 * a + b);
                     
-                    System.out.println("Message length3 = " + length);
+                    System.out.println("P1 Read Message length3 = " + length);
                     
                     byte[] buffer = new byte[length];
                     
@@ -165,7 +169,6 @@ public class Principal {
                     if(task != null){	                    
 	                    task.printTask();
 	                    QuicksortTask result = task.executeTask();
-	                    result.printTask();
 	                    
 	                    // Now we send the result back to 
 	                    payload = SerializationUtilities.serialize(result);
@@ -175,8 +178,8 @@ public class Principal {
 	
 	                    OutputStream out = socket.getOutputStream();
 	                    // two first bytes indicate the length in big endian format
-	                    a = (byte)(data.length / 256);
-	                    b = (byte)(data.length % 256);
+	                    a = (data.length / 256);
+	                    b = (data.length % 256);
 
 	                    out.write(a);
 	                    out.write(b);

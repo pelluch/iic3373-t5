@@ -1,5 +1,8 @@
-import java.io.*;
-import java.lang.reflect.Array;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -9,7 +12,7 @@ import java.util.Scanner;
 import java.util.concurrent.Semaphore;
 
 public class Executor {
-    private static final String TEST_FILE_NAME = "test_base.txt";
+    private static final String TEST_FILE_NAME = "test.txt";
     private static final int PORT_COUNTER = 10030;
 
     private int mProcesses;
@@ -124,8 +127,7 @@ public class Executor {
                 commands.add("-main");
             }
 
-            ProcessBuilder builder = new ProcessBuilder(commands);
-            builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+            ProcessBuilder builder = new ProcessBuilder(commands).redirectOutput(ProcessBuilder.Redirect.INHERIT);
             builder.start();
         }
 
@@ -194,20 +196,11 @@ public class Executor {
                     int length = a * 256 + b;
                     in.read(buffer, 0, length);
 
-                    ArrayMessage arrayMessage = (ArrayMessage) SerializationUtilities.deserialize(
+                    Message m = (Message) SerializationUtilities.deserialize(
                             buffer, 0, length);
-                    System.out.println("Message received from " + arrayMessage.getSender()
-                            + " to " + arrayMessage.getReceiver());
-
-                    int[] sortedArray = arrayMessage.getPayload();
-
-
-
-                    for(int i = 0; i < sortedArray.length; ++i) {
-                        System.out.print("" + i + ", ");
-                    }
-                    System.out.println("");
-                    //mListeners[m.getReceiver()].sendMessage(m);
+                    System.out.println("Message received from " + m.getSender()
+                            + " to " + m.getReceiver());
+                    mListeners[m.getReceiver()].sendMessage(m);
                 }
 
             } catch (IOException e) {
