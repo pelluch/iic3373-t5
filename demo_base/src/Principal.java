@@ -7,6 +7,7 @@ import java.util.Queue;
 public class Principal {
     // This simulation assumes the existence of two processes of ids 0 and 1
     // where the one with id 0 is the main process.
+	
 
     public static void main(String[] args) {
         // Study the received arguments to know what to parse
@@ -144,6 +145,7 @@ public class Principal {
                 
             } else {
             	QuicksortTask task = null;
+            	
             	do{
                     int a = socket.getInputStream().read();
                     int b = socket.getInputStream().read();
@@ -169,6 +171,7 @@ public class Principal {
                     if(task != null){	                    
 	                    task.printTask();
 	                    QuicksortTask result = task.executeTask();
+	                    result.printTask();
 	                    
 	                    // Now we send the result back to 
 	                    payload = SerializationUtilities.serialize(result);

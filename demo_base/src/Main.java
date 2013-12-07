@@ -14,7 +14,7 @@ public class Main {
 
         int workerId = 0;
         int portNumber = 0;
-        int numNeighbors = 0;
+        int[] neighbors = null;
         boolean isManager = false;
 
         for(int i = 0; i < args.length; ++i) {
@@ -24,7 +24,12 @@ public class Main {
             }
             else if(args[i] == "-neighbors") {
                 i++;
-                numNeighbors = Integer.parseInt(args[i]);
+                // Comma separated list of neighbor ids
+                String[] neighborList = args[i].split(",");
+                neighbors = new int[neighborList.length];
+                for(int j = 0; j < neighbors.length; ++j) {
+                    neighbors[j] = Integer.parseInt(neighborList[j]);
+                }
             }
             else if(args[i] == "-port") {
                 i++;
@@ -40,47 +45,15 @@ public class Main {
 
         Worker worker = null;
         if(isManager) {
-            worker = new Manager(workerId, portNumber, numNeighbors);
+            worker = new Manager(workerId, portNumber, neighbors);
         }
         else {
-            worker = new Worker(workerId, portNumber, numNeighbors);
+            worker = new Worker(workerId, portNumber, neighbors);
         }
-
-        try {
-
-            if (args.length > 6 && args[6].equals("-main")) {
-                // Main process sends a message to neighbor of id 1
-
-            	int[] toSort = new int[300];
-                for(int i = 0; i < toSort.length; ++i) {
-                    toSort[i] = i;
-                }
-
-            	ArrayMessage arrayMessage = new ArrayMessage(0, 0, toSort);
-                byte[] data = SerializationUtilities.serialize(arrayMessage);
-
-                //OutputStream out = socket.getOutputStream();
-                // two first bytes indicate the length in big endian format
-                byte a = (byte)(data.length / 256);
-                byte b = (byte)(data.length % 256);
-
-                //out.write(a);
-                //out.write(b);
-                //out.write(data);
-
-                System.out.println("Message length = " + data.length);
-                System.out.println("Message a = " + (int)a);
-                System.out.println("Message b = " + (int)b);
-                System.out.println("Message length2 = " + (a * 256 + b));
-
-            } else {
+        worker.start();
 
 
-            }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
 

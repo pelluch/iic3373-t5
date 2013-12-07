@@ -1,8 +1,5 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.lang.reflect.Array;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -127,7 +124,8 @@ public class Executor {
                 commands.add("-main");
             }
 
-            ProcessBuilder builder = new ProcessBuilder(commands).redirectOutput(ProcessBuilder.Redirect.INHERIT);
+            ProcessBuilder builder = new ProcessBuilder(commands);
+            builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
             builder.start();
         }
 
