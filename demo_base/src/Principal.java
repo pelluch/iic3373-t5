@@ -29,13 +29,28 @@ public class Principal {
 
                 OutputStream out = socket.getOutputStream();
                 // two first bytes indicate the length in big endian format
-                out.write((int)(data.length / 255));
-                out.write(data.length % 255);
+                byte a = (byte)(data.length / 256);
+                byte b = (byte)(data.length % 256);
+
+                out.write(a);
+                out.write(b);
                 out.write(data);
 
+                System.out.println("Message length = " + data.length);
+                System.out.println("Message a = " + a);
+                System.out.println("Message b = " + b);
+                System.out.println("Message length2 = " + (a * 256 + b));
+
             } else {
-                int length = socket.getInputStream().read();
-                length = length * 255 + socket.getInputStream().read();
+                int a = socket.getInputStream().read();
+                int b = socket.getInputStream().read();
+                
+                System.out.println("Message a = " + a);
+                System.out.println("Message b = " + b);
+
+                int length = (256 * a + b);
+                
+                System.out.println("Message length3 = " + length);
                 
                 byte[] buffer = new byte[length];
                 
