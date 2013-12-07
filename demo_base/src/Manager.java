@@ -13,7 +13,6 @@ public class Manager extends Worker {
 
     private int answerCount = 0;
 
-    private ArrayList<Worker> neighbors = new ArrayList<Worker>();
     private ArrayList<Worker> networkGraph = new ArrayList<Worker>();
 
     public Manager(int workerId, int portNumber, int[] neighbors) {
@@ -39,14 +38,18 @@ public class Manager extends Worker {
         try {
             mClientSocket = new Socket((String) null, mPortNumber);
             while(answerCount < arrayLength){
-                // Main process sends a message to neighbor of id 1
-                // ------------------------------------------------------------------------------------
-                QuicksortTask task = taskQueue.remove();
-                System.out.println("Before send message MANAGER");
-                sendMessage(1, task);
-                System.out.println("After send message MANAGER");
-                task = receiveMessage();
-                System.out.println("After receive message MANAGER");
+
+            	// Main process sends a message to neighbors
+                // ------------------------------------------------------------------------------------                
+            	QuicksortTask task;
+            	
+            	for(int i = 0; i < mNeighbors.length && taskQueue.size() > 0; i++){                
+                    task = taskQueue.remove();
+                	sendMessage(mNeighbors[i], task);
+                }
+                
+            	task = receiveMessage();
+
                 // Obtained the result, we then proceed to get its result:
                 int resultPivotPos = task.getPivotPos();
                 int resultStartIndex = task.getStartIndex();
