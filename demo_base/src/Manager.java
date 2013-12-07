@@ -13,13 +13,10 @@ public class Manager extends Worker {
 
     private int answerCount = 0;
 
-    private ArrayList<Worker> neighbors = new ArrayList<Worker>();
     private ArrayList<Worker> networkGraph = new ArrayList<Worker>();
 
     public Manager(int workerId, int portNumber, int[] neighbors) {
         super(workerId, portNumber, neighbors);
-
-
     }
 
     @Override
@@ -29,7 +26,6 @@ public class Manager extends Worker {
         int[] result = new int[array.length];								// Array to store the sorted array
         int arrayLength = array.length;										// length of the array to sort
         Queue<QuicksortTask> taskQueue = new LinkedList<QuicksortTask>();	// Task FIFO list
-        System.out.println("Start manager");
 
 
         // Creates first task and puts it in the task queue:
@@ -42,11 +38,8 @@ public class Manager extends Worker {
                 // Main process sends a message to neighbor of id 1
                 // ------------------------------------------------------------------------------------
                 QuicksortTask task = taskQueue.remove();
-                System.out.println("Before send message MANAGER");
                 sendMessage(1, task);
-                System.out.println("After send message MANAGER");
                 task = receiveMessage();
-                System.out.println("After receive message MANAGER");
                 // Obtained the result, we then proceed to get its result:
                 int resultPivotPos = task.getPivotPos();
                 int resultStartIndex = task.getStartIndex();
