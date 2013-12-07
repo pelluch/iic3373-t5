@@ -8,6 +8,10 @@ public class QuicksortTask implements Serializable {
 	private int pivotPos;
 	private int[] array;
 	
+	public int getStartIndex()	{ return startIndex; }
+	public int getPivotPos()	{ return pivotPos; }
+	public int[] getArray()		{ return array; }
+	
 	public QuicksortTask(int startIndex, int pivotPos, int[] array){
 		this.startIndex = startIndex;
 		this.pivotPos = pivotPos;
@@ -35,10 +39,16 @@ public class QuicksortTask implements Serializable {
 	}
 	
 	public void printTask(){
-		System.out.print("Task: [");
+		System.out.println("Task");
+		System.out.println("------------------------------------------");
+		System.out.println("startIndex = " + startIndex);
+		System.out.println("pivotPos = " + pivotPos);
+		
+		System.out.print("Array: [");
 		for(int i = 0; i < array.length; i++)
 			System.out.print(array[i] + ", ");
 		
 		System.out.println("EOT]");
+		System.out.println("------------------------------------------\n");
 	}
 }
