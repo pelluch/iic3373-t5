@@ -9,23 +9,26 @@ public class Worker {
 
     protected int mWorkerId;
     protected int mPortNumber;
-    protected int mNumNeighbors;
-
+    protected int[] mNeighbors;
+    protected final static int MANAGER_ID = 0;
     protected ServerSocket mServerSocket = null;
     protected Socket mClientSocket = null;
 
-    public Worker(int workerId, int portNumber, int numNeighbors) {
+    public Worker(int workerId, int portNumber, int[] neighbors) {
 
         mWorkerId = workerId;
         mPortNumber = portNumber;
-        mNumNeighbors = numNeighbors;
+        mNeighbors = neighbors;
 
         try {
-
             mServerSocket = new ServerSocket(portNumber);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    protected void start() {
+        receiveMessages();
     }
 
     protected void receiveMessages() {
@@ -42,6 +45,7 @@ public class Worker {
     }
 
     protected void sendMessage(int receiverId) {
+
 
 
     }
