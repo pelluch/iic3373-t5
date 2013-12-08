@@ -28,27 +28,6 @@ public class QuicksortTask implements Serializable, Task {
         array = new int[] { 6, 2, 9, 0, 7, 3, 8, 4, 5, 1 };
     }
 
-	public Task executeTask(){
-		int[] result = new int[array.length];
-		int pivot = array[0];
-		
-		int beginIndex = 0;
-		int endIndex = result.length - 1;
-		
-		for(int i = 1; i < array.length; i++){
-			int value = array[i];
-			
-			if(value <= pivot)
-				result[beginIndex++] = value;
-			else
-				result[endIndex--] = value;
-		}
-		result[beginIndex] = pivot;
-		
-		return new QuicksortTask(startIndex, beginIndex, result);
-	}
-
-
     public ArrayList<Task> getNextTasks(Object[] currentResults) {
         ArrayList<Task> next = new ArrayList<Task>();
 

@@ -6,7 +6,6 @@ import java.util.ArrayList;
  */
 public interface Task extends Serializable {
 
-    public Task executeTask();
     public ArrayList<Task> getNextTasks(Object[] currentResults);
     public  int getAnswerCount();
 
