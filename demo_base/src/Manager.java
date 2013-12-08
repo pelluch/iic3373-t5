@@ -22,20 +22,20 @@ public class Manager extends Worker {
     @Override
     protected void start() {
 
-        int[] array = new int[] { 6, 2, 9, 0, 7, 3, 8, 4, 5, 1 }; 			// Array to sort
-        int[] result = new int[array.length];								// Array to store the sorted array
-        int arrayLength = array.length;										// length of the array to sort
+
+       				// Array to store the sorted array
         Queue<QuicksortTask> taskQueue = new LinkedList<QuicksortTask>();	// Task FIFO list
         System.out.println("Start manager");
 
 
         // Creates first task and puts it in the task queue:
-        QuicksortTask firstTask = new QuicksortTask(0, 1, array);
+        QuicksortTask firstTask = new QuicksortTask();
+        int answerCount = 0;
+        Object[] result = new Object[firstTask.getAnswerCount()];
         taskQueue.add(firstTask);
-
         try {
             mClientSocket = new Socket((String) null, mPortNumber);
-            while(answerCount < arrayLength){
+            while(answerCount < firstTask.getAnswerCount()){
 
             	// Main process sends a message to neighbors
                 // ------------------------------------------------------------------------------------                
@@ -45,41 +45,17 @@ public class Manager extends Worker {
                     task = taskQueue.remove();
                 	sendMessage(mNeighbors[i], task);
                 }
-                
+
+                System.out.println("Answer count: " + answerCount);
             	task = receiveMessage();
 
-                // Obtained the result, we then proceed to get its result:
-                int resultPivotPos = task.getPivotPos();
-                int resultStartIndex = task.getStartIndex();
-                int[] resultArray =  task.getArray();
-
-                // Store the resulting pivot in the array:
-                result[resultStartIndex + resultPivotPos] = resultArray[resultPivotPos];
+                ArrayList<QuicksortTask> nextTasks = task.getNextTasks(result);
+                System.out.println("Message received");
+                for(int i = 0; i < nextTasks.size(); ++i) {
+                    taskQueue.add(nextTasks.get(i));
+                }
                 answerCount++;
-
-                // Then we proceed to split the remaining array in 2 subtasks:
-                if(resultPivotPos < resultArray.length - 1){
-                    int newLength = resultArray.length - 1 - resultPivotPos;
-                    int newStartIndex = resultStartIndex + resultPivotPos + 1;
-                    int[] newArray = new int[newLength];
-
-                    for(int originalIndex = resultPivotPos + 1, index = 0; originalIndex < resultArray.length; originalIndex++, index++)
-                        newArray[index] = resultArray[originalIndex];
-
-                    QuicksortTask newTask = new QuicksortTask(newStartIndex, -1, newArray);
-                    taskQueue.add(newTask);
-                }
-                if(resultPivotPos > 0){
-                    int newLength = resultPivotPos;
-                    int newStartIndex = resultStartIndex;
-                    int[] newArray = new int[newLength];
-
-                    for(int i = 0; i < resultPivotPos; i++)
-                        newArray[i] = resultArray[i];
-
-                    QuicksortTask newTask = new QuicksortTask(newStartIndex, -1, newArray);
-                    taskQueue.add(newTask);
-                }
+                System.out.println("Number of tasks: " + nextTasks.size());
             }
 
             // Once ended, print result and send null task to children (in this case, process 1):
@@ -90,7 +66,7 @@ public class Manager extends Worker {
             System.out.print("[");
 
             for(int i = 0; i < result.length; i++)
-                System.out.print(result[i] + ", ");
+                System.out.print((Integer)result[i] + ", ");
             System.out.println("EOT]");
             System.out.println("==========================================================");
 

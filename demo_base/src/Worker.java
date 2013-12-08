@@ -21,9 +21,6 @@ public class Worker {
         mPortNumber = portNumber;
         mNeighbors = neighbors;
 
-        //System.out.println("mWorker id = " + mWorkerId);
-        //System.out.println("mPortNumber id = " + mPortNumber);
-        //System.out.println("mNeighbors = " + mNeighbors);
 
         System.out.print("Adjacency list for " + mWorkerId + ": ");
         for(int i = 0; i < neighbors.length; ++i) {
