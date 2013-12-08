@@ -2,7 +2,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 
-public class QuicksortTask implements Serializable {
+public class QuicksortTask implements Serializable, Task {
 
 	private static final long serialVersionUID = 2989395239186231271L;
     public  int getAnswerCount() {
@@ -28,7 +28,7 @@ public class QuicksortTask implements Serializable {
         array = new int[] { 6, 2, 9, 0, 7, 3, 8, 4, 5, 1 };
     }
 
-	public QuicksortTask executeTask(){
+	public Task executeTask(){
 		int[] result = new int[array.length];
 		int pivot = array[0];
 		
@@ -49,8 +49,8 @@ public class QuicksortTask implements Serializable {
 	}
 
 
-    public ArrayList<QuicksortTask> getNextTasks(Object[] currentResults) {
-        ArrayList<QuicksortTask> next = new ArrayList<QuicksortTask>();
+    public ArrayList<Task> getNextTasks(Object[] currentResults) {
+        ArrayList<Task> next = new ArrayList<Task>();
 
         // Obtained the result, we then proceed to get its result:
         int resultPivotPos = getPivotPos();

@@ -25,7 +25,7 @@ public class Manager extends Worker {
 
 
        				// Array to store the sorted array
-        Queue<QuicksortTask> taskQueue = new LinkedList<QuicksortTask>();	// Task FIFO list
+        Queue<Task> taskQueue = new LinkedList<Task>();	// Task FIFO list
         System.out.println("Start manager");
 
         // Initialize hashmap of availability:
@@ -45,7 +45,7 @@ public class Manager extends Worker {
 
             	// Main process sends a message to neighbors
                 // ------------------------------------------------------------------------------------                
-            	QuicksortTask task;
+            	Task task;
             	
             	for(int i = 0; i < mNeighbors.length && taskQueue.size() > 0; i++){                
                     task = taskQueue.remove();
@@ -57,7 +57,7 @@ public class Manager extends Worker {
                 System.out.println("Answer count: " + answerCount);
             	task = receiveTask();
 
-                ArrayList<QuicksortTask> nextTasks = task.getNextTasks(result);
+                ArrayList<Task> nextTasks = task.getNextTasks(result);
                 System.out.println("Message received");
                 for(int i = 0; i < nextTasks.size(); ++i) {
                     taskQueue.add(nextTasks.get(i));

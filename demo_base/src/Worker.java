@@ -53,7 +53,7 @@ public class Worker {
             do{
                 task = receiveTask();
                 if(task != null){
-                    QuicksortTask result = task.executeTask();
+                    Task result = task.executeTask();
                     sendMessage(MANAGER_ID, result);
                 }
                 // He then sends another message.
@@ -93,7 +93,7 @@ public class Worker {
         return task;
     }
     
-    protected void sendMessage(int receiverId, QuicksortTask task) throws Exception {
+    protected void sendMessage(int receiverId, Task task) throws Exception {
 
         OutputStream out = mClientSocket.getOutputStream();
         // Sserialize task
