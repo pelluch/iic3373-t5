@@ -15,9 +15,10 @@ public class Manager extends Worker {
     private int answerCount = 0;
 
     private ArrayList<Worker> networkGraph = new ArrayList<Worker>();
-
-    public Manager(int workerId, int portNumber, int[] neighbors) {
+    private Class mTaskClass;
+    public Manager(int workerId, int portNumber, int[] neighbors, Class taskClass) {
         super(workerId, portNumber, neighbors);
+        mTaskClass = taskClass;
     }
 
     @Override
@@ -34,7 +35,15 @@ public class Manager extends Worker {
         	busyNeighbors.put(mNeighbors[i], false);
 
         // Creates first task and puts it in the task queue:
-        QuicksortTask firstTask = new QuicksortTask();
+        Task firstTask = null;
+        try {
+            firstTask = (Task)mTaskClass.newInstance();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
         int answerCount = 0;
         Object[] result = new Object[firstTask.getAnswerCount()];
         taskQueue.add(firstTask);
@@ -69,7 +78,7 @@ public class Manager extends Worker {
             // Once ended, print result and send null task to children:
             // ------------------------------------------------------------------------------------
             for(int workerId : mNeighbors){
-            	QuicksortTask t = null;
+            	Task t = null;
             	sendMessage(workerId, t);
             }
             System.out.println("RESULT");

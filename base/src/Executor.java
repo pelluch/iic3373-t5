@@ -19,7 +19,7 @@ public class Executor {
     private Semaphore[] mSemaphores;
 
     private String mProgramName;
-
+    private String mTaskClassName;
     public Executor(String programName) {
         mRandom = new Random();
         mProgramName = programName;
@@ -38,6 +38,10 @@ public class Executor {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        System.out
+                .println("Enter the class name of the task to load. Example: QuicksortTask");
+        mTaskClassName = s.nextLine();
 
         s.close();
     }
@@ -118,11 +122,14 @@ public class Executor {
             commands.add("-port");
             commands.add("" + (PORT_COUNTER + i));
 
+            commands.add("-task");
+            commands.add(mTaskClassName);
             // Only the process of id 0 has the -main attribute that specifies
             // it is the main process.
             if (i == 0) {
                 commands.add("-main");
             }
+
 
 
             ProcessBuilder builder = new ProcessBuilder(commands);

@@ -8,13 +8,13 @@ public class Main {
     // where the one with id 0 is the main process.
 
 
-    /*// Class is of the form "net.viralpatel.itext.pdf.DemoClass"
-    public Object testReflection(String className) throws Exception {
+    // Class is of the form "net.viralpatel.itext.pdf.DemoClass"
+    public static Class getTaskClass(String className) throws Exception {
 
         ClassLoader taskLoader = ClassLoader.getSystemClassLoader();
         Class taskClass = taskLoader.loadClass(className);
 
-        Method taskMethod = taskClass.getMethod("executeTask");
+        //Method taskMethod = taskClass.getMethod("executeTask");
 
         //Object taskInstance = taskClass.newInstance();
         //Method myMethod = taskClass.getMethod("demoMethod",
@@ -26,9 +26,10 @@ public class Main {
       //  System.out.println("The value returned from the method is:"
       //          + returnValue);
 
-        return null;
+        return taskClass;
 
-    }*/
+    }
+
     public static void main(String[] args) {
         // Study the received arguments to know what to parse
 
@@ -74,7 +75,11 @@ public class Main {
         Manager manager = null;
 
         if(isManager) {
-            manager = new Manager(workerId, portNumber, neighbors);
+            try {
+                manager = new Manager(workerId, portNumber, neighbors, getTaskClass(taskClassName));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             manager.start();
         }
         else {
