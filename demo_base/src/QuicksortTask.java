@@ -68,6 +68,27 @@ public class QuicksortTask implements Serializable, Task {
 
         return next;
     }
+
+    public Task executeTask(){
+        int[] result = new int[array.length];
+        int pivot = array[0];
+
+                int beginIndex = 0;
+        int endIndex = result.length - 1;
+
+                for(int i = 1; i < array.length; i++){
+                int value = array[i];
+
+                        if(value <= pivot)
+                        result[beginIndex++] = value;
+                else
+                    result[endIndex--] = value;
+            }
+        result[beginIndex] = pivot;
+
+        return new QuicksortTask(startIndex, beginIndex, result);
+    }
+
 	public void printTask(){
 		System.out.println("Task");
 		System.out.println("------------------------------------------");
