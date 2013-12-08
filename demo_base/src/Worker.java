@@ -51,7 +51,7 @@ public class Worker {
             QuicksortTask task = null;
 
             do{
-                task = receiveMessage();
+                task = receiveTask();
                 if(task != null){
                     QuicksortTask result = task.executeTask();
                     sendMessage(MANAGER_ID, result);
@@ -60,14 +60,16 @@ public class Worker {
             }while(task != null);
         }
         catch(IOException ioException) {
+            System.out.println("Socket exception");
             ioException.printStackTrace();
         }
         catch(java.lang.Exception langException) {
+            System.out.println("Error serializing");
             langException.printStackTrace();
         }
     }
 
-    protected QuicksortTask receiveMessage() throws Exception {
+    protected Message receiveMessage() throws Exception {
 
         InputStream in = mClientSocket.getInputStream();
         int length = getMessageLength();
@@ -77,18 +79,24 @@ public class Worker {
 
         Message m = (Message) SerializationUtilities.deserialize(buffer, 0, length);
 
+        return m;
+    }
+
+    protected QuicksortTask receiveTask() throws Exception {
+
+    	Message m = receiveMessage();
+
         // Now we get the task:
         byte[] payload = m.getPayload();
         QuicksortTask task = (QuicksortTask)SerializationUtilities.deserialize(payload, 0, payload.length);
 
-
         return task;
-
     }
+    
     protected void sendMessage(int receiverId, QuicksortTask task) throws Exception {
 
         OutputStream out = mClientSocket.getOutputStream();
-        // serialize task
+        // Sserialize task
         byte[] payload = SerializationUtilities.serialize(task);
 
         Message m = new Message(mWorkerId, receiverId, payload);
@@ -105,8 +113,28 @@ public class Worker {
         out.write(a);
         out.write(b);
         out.write(data);
+    }
+    
+    protected void sendMessage(int receiverId, NetworkTopologyTask task) throws Exception {
 
+        OutputStream out = mClientSocket.getOutputStream();
+        // Sserialize task
+        byte[] payload = SerializationUtilities.serialize(task);
 
+        Message m = new Message(mWorkerId, receiverId, payload);
+
+        // Now we serialize the message:
+        byte[] data = SerializationUtilities.serialize(m);
+
+        // two first bytes indicate the length in big endian format
+        int a, b;
+
+        a = (data.length / 256);
+        b = (data.length % 256);
+
+        out.write(a);
+        out.write(b);
+        out.write(data);
     }
 
 

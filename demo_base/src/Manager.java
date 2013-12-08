@@ -3,6 +3,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -27,6 +28,10 @@ public class Manager extends Worker {
         Queue<QuicksortTask> taskQueue = new LinkedList<QuicksortTask>();	// Task FIFO list
         System.out.println("Start manager");
 
+        // Initialize hashmap of availability:
+        HashMap<Integer, Boolean> busyNeighbors = new HashMap<Integer, Boolean>();
+        for(int i = 0; i < mNeighbors.length; i++)
+        	busyNeighbors.put(mNeighbors[i], false);
 
         // Creates first task and puts it in the task queue:
         QuicksortTask firstTask = new QuicksortTask();
@@ -46,9 +51,11 @@ public class Manager extends Worker {
                     task = taskQueue.remove();
                 	sendMessage(mNeighbors[i], task);
                 }
+                
+            	//Message m = receiveMessage();
 
                 System.out.println("Answer count: " + answerCount);
-            	task = receiveMessage();
+            	task = receiveTask();
 
                 ArrayList<QuicksortTask> nextTasks = task.getNextTasks(result);
                 System.out.println("Message received");
@@ -59,11 +66,12 @@ public class Manager extends Worker {
                 System.out.println("Number of tasks: " + nextTasks.size());
             }
 
-            // Once ended, print result and send null task to children (in this case, process 1):
+            // Once ended, print result and send null task to children:
             // ------------------------------------------------------------------------------------
-            for(int workerId : mNeighbors)
-            	sendMessage(workerId, null);
-            		
+            for(int workerId : mNeighbors){
+            	QuicksortTask t = null;
+            	sendMessage(workerId, t);
+            }
             System.out.println("RESULT");
             System.out.println("==========================================================");
             System.out.print("[");
