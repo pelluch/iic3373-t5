@@ -49,7 +49,7 @@ public class Worker {
 
             do{
                 System.out.println("Before WORKER " + mWorkerId + " receive message");
-                task = receiveMessage();
+                task = receiveTask();
                 System.out.println("After WORKER " + mWorkerId + " receive message");
                 if(task != null){
                     QuicksortTask result = task.executeTask();
@@ -68,15 +68,24 @@ public class Worker {
         }
     }
 
-    protected QuicksortTask receiveMessage() throws Exception {
+    protected Message receiveMessage() throws Exception {
 
-        System.out.println("Getting input stream");
         InputStream in = mClientSocket.getInputStream();
-        System.out.println("Getting length");
         int length = getMessageLength();
-        System.out.println("Length is " + length);
         byte[] buffer = new byte[length];
-        System.out.println("Reading buffer");
+
+        in.read(buffer, 0, length);
+
+        Message m = (Message) SerializationUtilities.deserialize(buffer, 0, length);
+
+        return m;
+    }
+
+    protected QuicksortTask receiveTask() throws Exception {
+
+        InputStream in = mClientSocket.getInputStream();
+        int length = getMessageLength();
+        byte[] buffer = new byte[length];
 
         in.read(buffer, 0, length);
 
@@ -86,10 +95,9 @@ public class Worker {
         byte[] payload = m.getPayload();
         QuicksortTask task = (QuicksortTask)SerializationUtilities.deserialize(payload, 0, payload.length);
 
-
         return task;
-
     }
+    
     protected void sendMessage(int receiverId, QuicksortTask task) throws Exception {
 
         OutputStream out = mClientSocket.getOutputStream();

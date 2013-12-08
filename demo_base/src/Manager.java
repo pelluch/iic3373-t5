@@ -3,6 +3,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -30,6 +31,10 @@ public class Manager extends Worker {
         Queue<QuicksortTask> taskQueue = new LinkedList<QuicksortTask>();	// Task FIFO list
         System.out.println("Start manager");
 
+        // Initialize hashmap of availability:
+        HashMap<Integer, Boolean> busyNeighbors = new HashMap<Integer, Boolean>();
+        for(int i = 0; i < mNeighbors.length; i++)
+        	busyNeighbors.put(mNeighbors[i], false);
 
         // Creates first task and puts it in the task queue:
         QuicksortTask firstTask = new QuicksortTask(0, 1, array);
@@ -43,12 +48,23 @@ public class Manager extends Worker {
                 // ------------------------------------------------------------------------------------                
             	QuicksortTask task;
             	
-            	for(int i = 0; i < mNeighbors.length && taskQueue.size() > 0; i++){                
-                    task = taskQueue.remove();
-                	sendMessage(mNeighbors[i], task);
+            	for(int i = 0; i < mNeighbors.length && taskQueue.size() > 0; i++){
+        			int workerId = mNeighbors[i];
+
+        			if(!busyNeighbors.get(workerId)){
+	                    task = taskQueue.remove();
+	                	sendMessage(workerId, task);
+	                	busyNeighbors.put(workerId, true);
+            		}
                 }
                 
-            	task = receiveMessage();
+            	Message m = receiveMessage();
+
+            	int workerId = m.getSender();
+            	busyNeighbors.put(workerId, false);
+
+            	byte[] payload = m.getPayload();
+                task = (QuicksortTask)SerializationUtilities.deserialize(payload, 0, payload.length);
 
                 // Obtained the result, we then proceed to get its result:
                 int resultPivotPos = task.getPivotPos();
@@ -98,14 +114,8 @@ public class Manager extends Worker {
 
 
         }
-        catch(IOException ioException) {
-            System.out.println("Socket exception");
-            ioException.printStackTrace();
+        catch(Exception e) {
+            e.printStackTrace();
         }
-        catch(java.lang.Exception langException) {
-            System.out.println("Error serializing");
-            langException.printStackTrace();
-        }
-
     }
 }
