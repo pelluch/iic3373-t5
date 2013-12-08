@@ -24,12 +24,13 @@
 
 	Para solucionar el problema planteado, se optó por utilizar el código base en Java entregado a los alumnos. La solución está en dos carpetas distintas, al igual que el código base: En demo se encuentra la clase Executor, que fue ligeramente modificada para poder trabajar con un parámetro extra, que especifica el problema que se quiere resolver (bonus del enunciado). En demo\_base se encuentra el código correspondientes a los problemas y trabajadores de la red adhoc.
 
-	El problema se carga por reflection y se le pide al usuario por consola, inmediatamente después de que se le pide elegir si quiere cargar una matriz de adyacencia aleatoria o bien una prefabricada. Lo único que se debe especificar es el nombre de la clase que se desea utilizar, el cual debe estar en la misma carpeta que los otros archivos del código de demo\_base. El único requisito es que la clase debe derivar de la interfaz Task, la cual contiene declaraciones de métodos genéricos. Como ejemplo, se implementó la clase QuicksortTask, la cual implementa un quicksort distribuido.
+	El problema se carga por reflection y se le pide al usuario por consola, inmediatamente después de que se le pide elegir si quiere cargar una matriz de adyacencia aleatoria o bien una prefabricada. Lo único que se debe especificar es el nombre de la clase que se desea utilizar, el cual debe estar en la misma carpeta que los otros archivos del código de demo\_base. El único requisito es que la clase debe derivar de la interfaz Task, la cual contiene declaraciones de métodos genéricos. Como ejemplo, se implementó la clase QuicksortTask, la cual implementa un quicksort distribuido. Retorna una instancia del problema resuelto que será serializado y enviado de vuelta al administrador.
 
 	Los métodos que requiere la interfaz task son:
 
 	\begin{enumerate}
 		\item int getAnswerCount(); // Corresponde al número de respuestas que debería esperar a recibir el proceso principal. En el caso de QuicksortTask, corresponde al número de elementos del arreglo.
+		\item Task executeTask(); // Método ejecutado por los objetos de la clase Worker para trabajar sobre una instancia de un problema concreto. 
 		\item $public ArrayList<Task> getNextTasks(Object[] currentResults);$ // Es el principal método de ejecución. Recibe como parámetro un arreglo de Objects correspondientes a la solución actual, el cual puede contener cualquier tipo de objeto. En el caso de QuicksortTask, son enteros. Puede tener un número arbitrario de elementos. 
 		Retorna un ArrayLists de Tasks que corresponden a los próximo subtasks que deben ejecutar otros procesos en paralelo. Nuevamente, para el caso de QuicksortTask, es un ArrayList de dos elementos correspondientes a las dos llamadas recursivas de Quicksort. 
 
