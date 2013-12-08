@@ -98,9 +98,11 @@ public class Manager extends Worker {
                 }
             }
 
-            // Once ended, print result and send null task to children (in this case, process 1):
+            // Once ended, print result and send null task to children:
             // ------------------------------------------------------------------------------------
-           sendMessage(1, null);
+            for(int workerId : mNeighbors)
+            	sendMessage(workerId, null);
+            		
             System.out.println("RESULT");
             System.out.println("==========================================================");
             System.out.print("[");
