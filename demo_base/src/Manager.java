@@ -40,6 +40,11 @@ public class Manager extends Worker {
 
         try {
             mClientSocket = new Socket((String) null, mPortNumber);
+            
+            NetworkTopologyTask networkTask = new NetworkTopologyTask(SenderType.PROBE, mWorkerId, null);
+            sendMessage(0, networkTask);
+            getNetworkTopology();
+            
             while(answerCount < arrayLength){
 
             	// Main process sends a message to neighbors
@@ -100,9 +105,10 @@ public class Manager extends Worker {
 
             // Once ended, print result and send null task to children:
             // ------------------------------------------------------------------------------------
-            for(int workerId : mNeighbors)
-            	sendMessage(workerId, null);
-            		
+            for(int workerId : mNeighbors){
+            	QuicksortTask t = null;
+            	sendMessage(workerId, t);
+            }
             System.out.println("RESULT");
             System.out.println("==========================================================");
             System.out.print("[");

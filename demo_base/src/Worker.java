@@ -47,6 +47,8 @@ public class Worker {
             mClientSocket = new Socket((String) null, mPortNumber);
             QuicksortTask task = null;
 
+            getNetworkTopology();
+
             do{
                 System.out.println("Before WORKER " + mWorkerId + " receive message");
                 task = receiveTask();
@@ -68,7 +70,13 @@ public class Worker {
         }
     }
 
-    protected Message receiveMessage() throws Exception {
+    protected void getNetworkTopology() throws Exception {
+		Message m = receiveMessage();
+		
+		//for()
+	}
+
+	protected Message receiveMessage() throws Exception {
 
         InputStream in = mClientSocket.getInputStream();
         int length = getMessageLength();
@@ -112,8 +120,28 @@ public class Worker {
         out.write(a);
         out.write(b);
         out.write(data);
+    }
+    
+    protected void sendMessage(int receiverId, NetworkTopologyTask task) throws Exception {
 
+        OutputStream out = mClientSocket.getOutputStream();
+        // Sserialize task
+        byte[] payload = SerializationUtilities.serialize(task);
 
+        Message m = new Message(mWorkerId, receiverId, payload);
+
+        // Now we serialize the message:
+        byte[] data = SerializationUtilities.serialize(m);
+
+        // two first bytes indicate the length in big endian format
+        int a, b;
+
+        a = (data.length / 256);
+        b = (data.length % 256);
+
+        out.write(a);
+        out.write(b);
+        out.write(data);
     }
 
 
