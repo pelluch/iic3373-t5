@@ -33,6 +33,7 @@ public class Manager extends Worker {
         int answerCount = 0;
         Object[] result = new Object[firstTask.getAnswerCount()];
         taskQueue.add(firstTask);
+
         try {
             mClientSocket = new Socket((String) null, mPortNumber);
             while(answerCount < firstTask.getAnswerCount()){
@@ -60,7 +61,9 @@ public class Manager extends Worker {
 
             // Once ended, print result and send null task to children (in this case, process 1):
             // ------------------------------------------------------------------------------------
-           sendMessage(1, null);
+            for(int workerId : mNeighbors)
+            	sendMessage(workerId, null);
+            		
             System.out.println("RESULT");
             System.out.println("==========================================================");
             System.out.print("[");
@@ -72,14 +75,8 @@ public class Manager extends Worker {
 
 
         }
-        catch(IOException ioException) {
-            System.out.println("Socket exception");
-            ioException.printStackTrace();
+        catch(Exception e) {
+            e.printStackTrace();
         }
-        catch(java.lang.Exception langException) {
-            System.out.println("Error serializing");
-            langException.printStackTrace();
-        }
-
     }
 }
