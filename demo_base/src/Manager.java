@@ -18,8 +18,6 @@ public class Manager extends Worker {
 
     public Manager(int workerId, int portNumber, int[] neighbors) {
         super(workerId, portNumber, neighbors);
-
-
     }
 
     @Override

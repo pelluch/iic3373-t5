@@ -83,13 +83,7 @@ public class Worker {
 
     protected QuicksortTask receiveTask() throws Exception {
 
-        InputStream in = mClientSocket.getInputStream();
-        int length = getMessageLength();
-        byte[] buffer = new byte[length];
-
-        in.read(buffer, 0, length);
-
-        Message m = (Message) SerializationUtilities.deserialize(buffer, 0, length);
+    	Message m = receiveMessage();
 
         // Now we get the task:
         byte[] payload = m.getPayload();
